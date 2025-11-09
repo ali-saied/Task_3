@@ -47,6 +47,21 @@ export default function AllPerks() {
     // This effect depends on [perks], so it re-runs whenever perks changes
   }, [perks]) // Dependency: re-run when perks array changes
 
+  useEffect(() => {
+  loadAllPerks()
+  }, []) // empty dependency array = runs once on mount
+
+  useEffect(() => {
+  // debounce to avoid too many requests
+  const delay = setTimeout(() => {
+    loadAllPerks()
+  }, 500) // half-second delay after typing
+
+  return () => clearTimeout(delay)
+  }, [searchQuery, merchantFilter])
+
+
+
   
   async function loadAllPerks() {
     // Reset error state before new request
@@ -133,10 +148,11 @@ export default function AllPerks() {
                 {' '}Search by Name
               </label>
               <input
-                type="text"
-                className="input"
-                placeholder="Enter perk name..."
-                
+                  type="text"
+                  className="input"
+                  placeholder="Enter perk name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
               />
               <p className="text-xs text-zinc-500 mt-1">
                 Auto-searches as you type, or press Enter / click Search
@@ -149,18 +165,19 @@ export default function AllPerks() {
                 <span className="material-symbols-outlined text-sm align-middle">store</span>
                 {' '}Filter by Merchant
               </label>
-              <select
-                className="input"
-                
-              >
-                <option value="">All Merchants</option>
-                
-                {uniqueMerchants.map(merchant => (
-                  <option key={merchant} value={merchant}>
-                    {merchant}
-                  </option>
-                ))}
-              </select>
+            <select
+              className="input"
+              value={merchantFilter}
+              onChange={(e) => setMerchantFilter(e.target.value)}
+            >
+              <option value="">All Merchants</option>
+              {uniqueMerchants.map(merchant => (
+                <option key={merchant} value={merchant}>
+                  {merchant}
+                </option>
+              ))}
+            </select>
+
             </div>
           </div>
 
